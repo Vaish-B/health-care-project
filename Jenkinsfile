@@ -1,42 +1,26 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage('checkout the code from github'){
-            steps{
-                 git url: 'https://github.com/akshu20791/health-care-project/'
-                 echo 'github url checkout'
-            }
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "M2_HOME"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/Vaish-B/health-care-project.git'
+
+                // Run Maven on a Unix agent.
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+            }        
         }
-        stage('codecompile with akshat'){
-            steps{
-                echo 'starting compiling'
-                sh 'mvn compile'
+       stage('Generate Test Reports') {
+           steps {
+               publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/Healthcare/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                    }
             }
-        }
-        stage('codetesting with akshat'){
-            steps{
-                sh 'mvn test'
-            }
-        }
-        stage('qa with akshat'){
-            steps{
-                sh 'mvn checkstyle:checkstyle'
-            }
-        }
-        stage('package with akshat'){
-            steps{
-                sh 'mvn package'
-            }
-        }
-        stage('run dockerfile'){
-          steps{
-               sh 'docker build -t myimg1 .'
-           }
-         }
-        stage('port expose'){
-            steps{
-                sh 'docker run -dt -p 8082:8082 --name c001 myimg1'
-            }
-        }   
     }
 }
