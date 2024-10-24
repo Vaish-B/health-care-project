@@ -1,18 +1,19 @@
 pipeline {
-    agent any
+  agent any
+     tools {
+       maven 'M2_HOME'
+           }
 
-    tools {
-        // Install the Maven version configured as "M3" and add it to the path.
-        maven "M2_HOME"
-    }
-
-    stages {
-        stage('Build') {
-            steps {
-                // Get some code from a GitHub repository
+  stages {
+    stage('Git Checkout') {
+      steps {
+        echo 'This stage is to clone the repo from github'
              git branch: 'master', url: 'https://github.com/Vaish-B/health-care-project.git'
-
-                // Run Maven on a Unix agent.
+            }
+            }
+   stage('Create Package') {
+      steps {
+        echo 'This stage will compile, test, package my application'
                 sh 'mvn package'
 
             }        
